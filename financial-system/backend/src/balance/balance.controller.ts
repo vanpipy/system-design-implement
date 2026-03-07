@@ -1,9 +1,11 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Post,
   Query,
   Res,
@@ -48,6 +50,14 @@ export class BalanceController {
     @Query('from') from?: string,
     @Query('to') to?: string,
   ): Promise<{ items: unknown[] }> {
+    if (!requestId) {
+      const hasAccountTriple = !!(accountId && accountType && currency);
+      if (!hasAccountTriple) {
+        throw new BadRequestException(
+          'requestId 或 accountId/accountType/currency 必须提供其一',
+        );
+      }
+    }
     const items = await this.snapshotService.querySnapshots({
       requestId,
       accountId,
@@ -69,6 +79,11 @@ export class BalanceController {
     @Query('to') to?: string,
     @Query('businessRefNo') businessRefNo?: string,
   ): Promise<{ items: unknown[] }> {
+    if (!accountId || !accountType || !currency) {
+      throw new BadRequestException(
+        'accountId、accountType、currency 为必填参数',
+      );
+    }
     const items = await this.transactionQueryService.queryTransactions({
       accountId,
       accountType,
@@ -79,5 +94,55 @@ export class BalanceController {
     });
 
     return { items };
+  }
+
+  @Get()
+  async getBalance(
+    @Query('accountId') accountId?: string,
+    @Query('accountType') accountType?: string,
+    @Query('currency') currency?: string,
+  ): Promise<unknown> {
+    if (!accountId || !accountType || !currency) {
+      throw new BadRequestException(
+        'accountId、accountType、currency 为必填参数',
+      );
+    }
+    const record = (await this.balanceService.getBalance({
+      accountId,
+      accountType,
+      currency,
+    })) as
+      | {
+          accountId: string;
+          accountType: string;
+          currency: string;
+          balance: { toString: () => string } | string;
+          frozenBalance?: { toString: () => string } | string;
+          minBalance?: { toString: () => string } | string;
+          totalBalance?: { toString: () => string } | string;
+          status?: string;
+          allowNegative?: boolean;
+          updatedAt?: Date;
+        }
+      | null;
+    if (!record) {
+      throw new NotFoundException('账户不存在');
+    }
+    const toStr = (v: unknown, d = '0.00') =>
+      v && typeof (v as { toString: () => string }).toString === 'function'
+        ? (v as { toString: () => string }).toString()
+        : (v as string | undefined) ?? d;
+    return {
+      accountId: record.accountId,
+      accountType: record.accountType,
+      currency: record.currency,
+      balance: toStr(record.balance),
+      frozenBalance: toStr(record.frozenBalance),
+      totalBalance: toStr(record.totalBalance, toStr(record.balance)),
+      minBalance: toStr(record.minBalance),
+      status: record.status ?? 'ACTIVE',
+      allowNegative: record.allowNegative ?? false,
+      updatedAt: record.updatedAt?.toISOString?.() ?? undefined,
+    };
   }
 }
