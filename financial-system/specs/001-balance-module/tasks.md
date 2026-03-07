@@ -104,16 +104,16 @@
 
 ### Tests for User Story 3（TDD）
 
-- [ ] T024 [P] [US3] 在 `backend/test/balance/snapshot-by-request.e2e-spec.ts` 中编写 e2e 测试，验证通过 `requestId` 查询单次请求快照的能力
-- [ ] T025 [P] [US3] 在 `backend/test/balance/snapshot-by-account.e2e-spec.ts` 中编写 e2e 测试，验证按账户 + 时间范围查询快照列表的能力
-- [ ] T026 [P] [US3] 在 `backend/test/balance/transactions-query.e2e-spec.ts` 中编写 e2e 测试，验证按账户 + 时间范围 + `businessRefNo` 查询交易流水的能力
+- [x] T024 [P] [US3] 在 `backend/test/balance/snapshot-by-request.e2e-spec.ts` 中编写 e2e 测试，验证通过 `requestId` 查询单次请求快照的能力
+- [x] T025 [P] [US3] 在 `backend/test/balance/snapshot-by-account.e2e-spec.ts` 中编写 e2e 测试，验证按账户 + 时间范围查询快照列表的能力
+- [x] T026 [P] [US3] 在 `backend/test/balance/transactions-query.e2e-spec.ts` 中编写 e2e 测试，验证按账户 + 时间范围 + `businessRefNo` 查询交易流水的能力
 
 ### Implementation for User Story 3
 
-- [ ] T027 [P] [US3] 在 `backend/src/balance/snapshot.service.ts` 中实现基于 `BalanceSnapshot` 的查询服务，支持按 `requestId` 和账户 + 会计日期区间查询
-- [ ] T028 [US3] 在 `backend/src/balance/balance.controller.ts` 中实现 `GET /balances/snapshots` 接口，映射到 `SnapshotService` 并返回符合契约的列表结构
-- [ ] T029 [US3] 在 `backend/src/balance/transaction-query.service.ts` 中实现基于 `BalanceTransaction` 的流水查询服务，支持账户 + 时间范围 + `businessRefNo`
-- [ ] T030 [US3] 在 `backend/src/balance/balance.controller.ts` 中实现 `GET /balances/transactions` 接口，调用 `TransactionQueryService` 并返回契约定义的流水列表
+- [x] T027 [P] [US3] 在 `backend/src/balance/snapshot.service.ts` 中实现基于 `BalanceSnapshot` 的查询服务，支持按 `requestId` 和账户 + 会计日期区间查询
+- [x] T028 [US3] 在 `backend/src/balance/balance.controller.ts` 中实现 `GET /balances/snapshots` 接口，映射到 `SnapshotService` 并返回符合契约的列表结构
+- [x] T029 [US3] 在 `backend/src/balance/transaction-query.service.ts` 中实现基于 `BalanceTransaction` 的流水查询服务，支持账户 + 时间范围 + `businessRefNo`
+- [x] T030 [US3] 在 `backend/src/balance/balance.controller.ts` 中实现 `GET /balances/transactions` 接口，调用 `TransactionQueryService` 并返回契约定义的流水列表
 
 **Checkpoint**: 完成后，审计/风控可通过快照与流水接口独立完成余额变更追踪与问题定位。
 

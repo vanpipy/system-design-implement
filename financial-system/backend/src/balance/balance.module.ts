@@ -5,6 +5,8 @@ import { BalanceService } from './balance.service';
 import { BalanceRepository } from './balance.repository';
 import { IdempotencyRepository } from './idempotency.repository';
 import { TransactionManager } from './transaction-manager';
+import { SnapshotService } from './snapshot.service';
+import { TransactionQueryService } from './transaction-query.service';
 
 @Module({
   imports: [PrismaModule],
@@ -14,6 +16,8 @@ import { TransactionManager } from './transaction-manager';
     BalanceRepository,
     IdempotencyRepository,
     TransactionManager,
+    SnapshotService,
+    TransactionQueryService,
   ],
   exports: [BalanceService],
 })

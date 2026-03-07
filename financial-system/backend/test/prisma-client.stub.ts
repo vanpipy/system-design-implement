@@ -1,6 +1,25 @@
+class DecimalLike {
+  private readonly value: number;
+
+  constructor(value: string | number) {
+    this.value = typeof value === 'number' ? value : Number(value);
+  }
+
+  toFixed(dp: number) {
+    return this.value.toFixed(dp);
+  }
+
+  toString() {
+    return this.value.toString();
+  }
+}
+
 export class PrismaClient {
   private accountBalanceData = new Map<string, any>();
   private accountBalanceId = 1;
+  private balanceTransactionData: any[] = [];
+  private balanceSnapshotData: any[] = [];
+  private balanceSnapshotId = 1;
 
   $transaction<T>(
     fn: (tx: {
@@ -71,11 +90,124 @@ export class PrismaClient {
   };
 
   balanceTransaction = {
-    create: () => Promise.resolve(null),
+    create: (args: any) => {
+      const data = args?.data ?? args ?? {};
+      const record = {
+        ...data,
+        amount: new DecimalLike(data.amount ?? 0),
+        beforeBalance: new DecimalLike(data.beforeBalance ?? 0),
+        afterBalance: new DecimalLike(data.afterBalance ?? 0),
+        transactionTime: data.transactionTime ?? new Date(),
+        accountingDate: data.accountingDate ?? new Date(),
+      };
+      this.balanceTransactionData.push(record);
+      return Promise.resolve(record);
+    },
+    findMany: (args?: any) => {
+      const where = args?.where ?? {};
+      let results = this.balanceTransactionData.slice();
+
+      if (where.accountId) {
+        results = results.filter((tx) => tx.accountId === where.accountId);
+      }
+
+      if (where.accountType) {
+        results = results.filter((tx) => tx.accountType === where.accountType);
+      }
+
+      if (where.currency) {
+        results = results.filter((tx) => tx.currency === where.currency);
+      }
+
+      if (where.businessRefNo) {
+        results = results.filter(
+          (tx) => tx.businessRefNo === where.businessRefNo,
+        );
+      }
+
+      if (where.transactionTime) {
+        const range = where.transactionTime as {
+          gte?: Date;
+          lte?: Date;
+        };
+        if (range.gte) {
+          results = results.filter((tx) => tx.transactionTime >= Number(range.gte));
+        }
+        if (range.lte) {
+          results = results.filter((tx) => tx.transactionTime <= Number(range.lte));
+        }
+      }
+
+      return Promise.resolve(results);
+    },
   };
 
   balanceSnapshot = {
-    create: () => Promise.resolve(null),
+    create: (args: any) => {
+      const data = args?.data ?? args ?? {};
+      const record = {
+        id: this.balanceSnapshotId++,
+        accountId: data.accountId,
+        accountType: data.accountType,
+        currency: data.currency,
+        requestId: data.requestId,
+        beforeBalance: new DecimalLike(data.beforeBalance ?? 0),
+        afterBalance: new DecimalLike(data.afterBalance ?? 0),
+        status: data.status ?? 'SUCCESS',
+        accountingDate: data.accountingDate ?? new Date(),
+        createdAt: data.createdAt ?? new Date(),
+        metadata: data.metadata ?? null,
+      };
+      this.balanceSnapshotData.push(record);
+      return Promise.resolve(record);
+    },
+    findMany: (args?: any) => {
+      const where = args?.where ?? {};
+      let results = this.balanceSnapshotData.slice();
+
+      if (where.requestId) {
+        results = results.filter(
+          (snapshot) => snapshot.requestId === where.requestId,
+        );
+      }
+
+      if (where.accountId) {
+        results = results.filter(
+          (snapshot) => snapshot.accountId === where.accountId,
+        );
+      }
+
+      if (where.accountType) {
+        results = results.filter(
+          (snapshot) => snapshot.accountType === where.accountType,
+        );
+      }
+
+      if (where.currency) {
+        results = results.filter(
+          (snapshot) => snapshot.currency === where.currency,
+        );
+      }
+
+      if (where.accountingDate) {
+        const range = where.accountingDate as {
+          gte?: Date;
+          lte?: Date;
+        };
+        if (range.gte) {
+          results = results.filter(
+            (snapshot) => snapshot.accountingDate >= Number(range.gte),
+          );
+        }
+        if (range.lte) {
+          results = results.filter(
+            (snapshot) => snapshot.accountingDate <= Number(range.lte),
+          );
+        }
+      }
+
+      return Promise.resolve(results);
+    },
   };
 
   idempotencyRecord = {
