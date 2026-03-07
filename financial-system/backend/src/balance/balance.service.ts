@@ -133,7 +133,8 @@ export class BalanceService {
             };
           }
 
-          for (const item of dto.transactions) {
+          for (let i = 0; i < dto.transactions.length; i++) {
+            const item = dto.transactions[i]!;
             const amount = new Decimal(item.amount);
             const txBefore = currentBalance;
             const txAfter =
@@ -146,9 +147,10 @@ export class BalanceService {
             const transactionNo = `TX-${Date.now()}-${Math.random()
               .toString(36)
               .slice(2, 10)}`;
+            const perItemIdempotencyKey = `${dto.idempotencyKey}:${i}`;
 
             await this.balanceRepository.createBalanceTransaction({
-              idempotencyKey: dto.idempotencyKey,
+              idempotencyKey: perItemIdempotencyKey,
               requestId: dto.requestId,
               batchId: dto.requestId,
               accountId,
