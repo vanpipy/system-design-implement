@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Res,
+} from '@nestjs/common';
+import type { Response } from 'express';
 import { BalanceService } from './balance.service';
 import { CreateBalanceTransactionsDto } from './dto/create-balance-transactions.dto';
 
@@ -8,9 +16,18 @@ export class BalanceController {
 
   @Post('transactions')
   @HttpCode(HttpStatus.CREATED)
-  createTransactions(
+  async createTransactions(
     @Body() dto: CreateBalanceTransactionsDto,
-  ): ReturnType<BalanceService['applyTransactions']> {
-    return this.balanceService.applyTransactions(dto);
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<unknown> {
+    const result = (await this.balanceService.applyTransactions(dto)) as {
+      status?: string;
+    } | null;
+
+    if (result && result.status === 'REJECTED') {
+      res.status(HttpStatus.BAD_REQUEST);
+    }
+
+    return result;
   }
 }

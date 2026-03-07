@@ -23,6 +23,12 @@ export class BalanceRepository {
     });
   }
 
+  createAccountBalance(data: Prisma.AccountBalanceCreateInput) {
+    return this.prisma.accountBalance.create({
+      data,
+    });
+  }
+
   updateAccountBalanceById(id: number, data: Prisma.AccountBalanceUpdateInput) {
     return this.prisma.accountBalance.update({
       where: { id },

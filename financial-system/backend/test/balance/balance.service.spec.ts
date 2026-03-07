@@ -14,6 +14,7 @@ describe('BalanceService', () => {
   let createBalanceTransaction: jest.Mock;
   let updateAccountBalanceById: jest.Mock;
   let createBalanceSnapshot: jest.Mock;
+  let createAccountBalance: jest.Mock;
 
   beforeEach(async () => {
     findAccountBalance = jest.fn();
@@ -24,6 +25,7 @@ describe('BalanceService', () => {
     createBalanceTransaction = jest.fn().mockResolvedValue(null);
     updateAccountBalanceById = jest.fn().mockResolvedValue(null);
     createBalanceSnapshot = jest.fn().mockResolvedValue(null);
+    createAccountBalance = jest.fn().mockResolvedValue(null);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -32,6 +34,7 @@ describe('BalanceService', () => {
           provide: BalanceRepository,
           useValue: {
             findAccountBalance,
+            createAccountBalance,
             createBalanceTransaction,
             updateAccountBalanceById,
             createBalanceSnapshot,

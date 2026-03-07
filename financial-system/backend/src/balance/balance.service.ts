@@ -5,6 +5,10 @@ import { BalanceRepository } from './balance.repository';
 import { IdempotencyRepository } from './idempotency.repository';
 import { TransactionManager } from './transaction-manager';
 import { CreateBalanceTransactionsDto } from './dto/create-balance-transactions.dto';
+import {
+  balanceConfig,
+  FAILURE_POLICY_REJECT_BATCH,
+} from './config/balance.config';
 
 @Injectable()
 export class BalanceService {
@@ -43,6 +47,8 @@ export class BalanceService {
             id: number;
             balance: unknown;
             frozenBalance: unknown;
+            minBalance?: unknown;
+            allowNegative?: boolean;
           } | null = await this.balanceRepository.findAccountBalance({
             accountId,
             accountType,
@@ -54,6 +60,18 @@ export class BalanceService {
                 (existing.balance as { toString: () => string }).toString(),
               )
             : new Decimal(0);
+          const minBalanceDecimal =
+            existing && existing.minBalance
+              ? new Decimal(
+                  (
+                    existing.minBalance as { toString: () => string }
+                  ).toString(),
+                )
+              : new Decimal(0);
+          const allowNegative =
+            existing && typeof existing.allowNegative === 'boolean'
+              ? existing.allowNegative
+              : false;
           let currentBalance = beforeBalanceDecimal;
 
           const transactions: {
@@ -66,6 +84,54 @@ export class BalanceService {
             businessRefNo?: string | null;
             status: string;
           }[] = [];
+
+          let simulatedBalance = beforeBalanceDecimal;
+          let overdraftDetected = false;
+
+          for (const item of dto.transactions) {
+            const amount = new Decimal(item.amount);
+            const candidateAfter =
+              item.direction === 'DEBIT'
+                ? simulatedBalance.minus(amount)
+                : simulatedBalance.plus(amount);
+
+            if (
+              balanceConfig.failurePolicy === FAILURE_POLICY_REJECT_BATCH &&
+              !allowNegative &&
+              candidateAfter.lt(minBalanceDecimal)
+            ) {
+              overdraftDetected = true;
+              break;
+            }
+
+            simulatedBalance = candidateAfter;
+          }
+
+          if (overdraftDetected) {
+            await this.balanceRepository.createBalanceSnapshot({
+              accountId,
+              accountType,
+              currency,
+              requestId: dto.requestId,
+              beforeBalance: beforeBalanceDecimal.toString(),
+              afterBalance: beforeBalanceDecimal.toString(),
+              status: 'REJECTED',
+              accountingDate: new Date(),
+            });
+
+            return {
+              requestId: dto.requestId,
+              status: 'REJECTED',
+              errorCode: 'INSUFFICIENT_FUNDS',
+              account: {
+                accountId,
+                accountType,
+                currency,
+                beforeBalance: beforeBalanceDecimal.toFixed(2),
+                afterBalance: beforeBalanceDecimal.toFixed(2),
+              },
+            };
+          }
 
           for (const item of dto.transactions) {
             const amount = new Decimal(item.amount);
@@ -134,6 +200,17 @@ export class BalanceService {
               totalBalance: currentBalance.plus(frozen).toString(),
               updatedAt: new Date(),
             } as never);
+          } else {
+            const frozen = new Decimal(0);
+            await this.balanceRepository.createAccountBalance({
+              accountId,
+              accountType,
+              currency,
+              balance: currentBalance.toString(),
+              frozenBalance: frozen.toString(),
+              totalBalance: currentBalance.plus(frozen).toString(),
+              status: 'ACTIVE',
+            } as never);
           }
 
           await this.balanceRepository.createBalanceSnapshot({
@@ -198,26 +275,20 @@ export class BalanceService {
     try {
       const result = await handler();
       if (record && typeof record.id === 'number') {
-        await this.idempotencyRepository.updateById(
-          record.id,
-          {
-            status: 'SUCCESS',
-            responseData: result as never,
-          } as never,
-        );
+        await this.idempotencyRepository.updateById(record.id, {
+          status: 'SUCCESS',
+          responseData: result as never,
+        } as never);
       }
       return result;
     } catch (error) {
       if (record && typeof record.id === 'number') {
-        await this.idempotencyRepository.updateById(
-          record.id,
-          {
-            status: 'FAILED',
-            errorInfo: {
-              message: (error as Error).message,
-            } as never,
+        await this.idempotencyRepository.updateById(record.id, {
+          status: 'FAILED',
+          errorInfo: {
+            message: (error as Error).message,
           } as never,
-        );
+        } as never);
       }
       throw error;
     }

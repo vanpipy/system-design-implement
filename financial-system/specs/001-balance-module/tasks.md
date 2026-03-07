@@ -72,15 +72,26 @@
 
 ### Tests for User Story 2（TDD）
 
-- [ ] T018 [P] [US2] 在 `backend/test/balance/overdraft-batch.e2e-spec.ts` 中编写 e2e 测试，覆盖“全部扣款导致超扣时整体拒绝”的场景
-- [ ] T019 [P] [US2] 在 `backend/src/balance/__tests__/failure-policy.spec.ts` 中编写单元测试，验证批量交易失败策略（全量回滚/整体拒绝）的决策逻辑
+- [x] T018 [P] [US2] 在 `backend/test/balance/overdraft-batch.e2e-spec.ts` 中编写 e2e 测试，覆盖“全部扣款导致超扣时整体拒绝”的场景
+- [x] T019 [P] [US2] 在 `backend/test/balance/failure-policy.spec.ts` 中编写单元测试，验证批量交易失败策略（全量回滚/整体拒绝）的决策逻辑
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] 在 `backend/src/balance/config/balance.config.ts` 中定义批量失败策略配置（如 `failurePolicy`），并提供从环境变量或配置文件加载的机制
-- [ ] T021 [US2] 在 `backend/src/balance/balance.service.ts` 中扩展 `applyTransactions`，在执行过程中检查 `minBalance` 与 `allowNegative`，并根据策略对超扣场景进行整体回滚或拒绝
-- [ ] T022 [US2] 在 `backend/src/balance/balance.controller.ts` 中完善 `POST /balances/transactions` 响应结构，在超扣时返回 `status: "REJECTED"`、错误码 `INSUFFICIENT_FUNDS` 以及请求前后余额信息
-- [ ] T023 [US2] 在 `backend/src/balance/balance.service.ts` 中处理交易列表为空的场景，将其视为无操作但返回成功，并记录相应快照
+- [x] T020 [P] [US2] 在 `backend/src/balance/config/balance.config.ts` 中定义批量失败策略配置（如 `failurePolicy`），并提供从环境变量或配置文件加载的机制
+- [x] T021 [US2] 在 `backend/src/balance/balance.service.ts` 中扩展 `applyTransactions`，在执行过程中检查 `minBalance` 与 `allowNegative`，并根据策略对超扣场景进行整体拒绝
+- [x] T022 [US2] 在 `backend/src/balance/balance.controller.ts` 中完善 `POST /balances/transactions` 响应结构，在超扣时返回 `status: "REJECTED"`、错误码 `INSUFFICIENT_FUNDS` 以及请求前后余额信息
+- [x] T023 [US2] 在 `backend/src/balance/balance.service.ts` 中处理交易列表为空的场景，将其视为无操作但返回成功，并记录相应快照
+
+#### 批量失败策略说明
+
+- 批量失败策略通过配置项 `BALANCE_FAILURE_POLICY` 控制，作用域为 Balance 模块后端进程。  
+- 当前实现仅支持策略值：`REJECT_BATCH`，并将其作为默认策略：当环境变量缺失或配置为非法值时，仍回退到 `REJECT_BATCH`。  
+- 当策略为 `REJECT_BATCH` 时，`T020–T023` 的实现需要保证：  
+  - 在事务内预演整批交易序列，结合账户的 `minBalance` 与 `allowNegative`；  
+  - 一旦预演过程中任意一笔会导致余额低于允许阈值，则整批请求被拒绝，不落账任何 `BalanceTransaction`；  
+  - 写入一条 `BalanceSnapshot`，其 `status` 为 `REJECTED`，`beforeBalance` 与 `afterBalance` 相同；  
+  - API 返回体中 `status: "REJECTED"`，错误码为 `INSUFFICIENT_FUNDS`。  
+- 后续如扩展其他失败策略（例如新策略名），应在 `T020` 所在配置文件中新增策略枚举值及解析逻辑，并在 `T021` 中的超扣处理分支中基于策略值切换行为。  
 
 **Checkpoint**: 完成后，可以独立验证批量交易在各种超扣情况中的行为，并保证不会产生负余额。
 
