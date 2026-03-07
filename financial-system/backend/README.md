@@ -28,47 +28,90 @@
 ## Project setup
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+## Local development
+
+### Environment variables
+
+Create a `.env` file in the `backend` 目录，最少包含数据库连接配置:
+
+```bash
+DATABASE_URL="postgresql://user:password@localhost:5432/financial_system"
+```
+
+本地开发可以使用 PostgreSQL 或 SQLite，二者通过 Prisma 切换:
+
+- PostgreSQL: 在 `prisma/schema.prisma` 的 `datasource db` 中保持 `provider = "postgresql"`，并将 `DATABASE_URL` 指向本地 Postgres 实例。
+- SQLite: 将 `provider` 改为 `"sqlite"`，并设置 `DATABASE_URL="file:./dev.db"`。
+
+修改 provider 后需重新生成 Prisma Client。
+
+### Prisma migrations
+
+每次调整数据模型后，使用 Prisma 迁移同步数据库结构:
+
+```bash
+npx prisma migrate dev --name init_balance_models
+npx prisma generate
+```
+
+### Start application
 
 ```bash
 # development
-$ npm run start
+npm run start
 
 # watch mode
-$ npm run start:dev
+npm run start:dev
 
-# production mode
-$ npm run start:prod
+# production build and start
+npm run build
+npm run start:prod
 ```
 
-## Run tests
+## Testing
 
 ```bash
 # unit tests
-$ npm run test
+npm run test
 
 # e2e tests
-$ npm run test:e2e
+npm run test:e2e
 
 # test coverage
-$ npm run test:cov
+npm run test:cov
 ```
 
-## Deployment
+## Docker
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+本项目提供 Docker 化运行方式，方便在本地或服务器上以一致环境运行:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# 在 financial-system 根目录执行
+docker compose up -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+该命令会启动:
+
+- PostgreSQL 数据库
+- Nest.js 应用容器
+
+启动后，默认应用会监听在 `http://localhost:3000`。
+
+如需更新镜像，先重新构建:
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+停止服务:
+
+```bash
+docker compose down
+```
 
 ## Resources
 
