@@ -19,9 +19,9 @@
 
 **Purpose**: 为余额模块准备必要的本地环境与数据库基础
 
-- [ ] T001 确认 `backend/.env` 中配置了 `DATABASE_URL` 指向本地开发数据库（PostgreSQL 或 SQLite）
-- [ ] T002 在 `backend/prisma/` 下执行并验证现有迁移，确保 `account_balance`、`transaction_journal`、`balance_snapshot`、`idempotency_record` 表已创建
-- [ ] T003 [P] 在 `backend/` 下确认 Jest 单元测试与 e2e 测试命令可正常运行（`npm run test`、`npm run test:e2e`）
+- [x] T001 确认 `backend/.env` 中配置了 `DATABASE_URL` 指向本地开发数据库（PostgreSQL 或 SQLite）
+- [x] T002 在 `backend/prisma/` 下执行并验证现有迁移，确保 `account_balance`、`transaction_journal`、`balance_snapshot`、`idempotency_record` 表已创建
+- [x] T003 [P] 在 `backend/` 下确认 Jest 单元测试与 e2e 测试命令可正常运行（`npm run test`、`npm run test:e2e`）
 
 ---
 
