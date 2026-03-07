@@ -1,5 +1,5 @@
-import { TransactionManager } from './transaction-manager';
-import { PrismaService } from '../prisma/prisma.service';
+import { TransactionManager } from '../../src/balance/transaction-manager';
+import { PrismaService } from '../../src/prisma/prisma.service';
 
 describe('TransactionManager', () => {
   let manager: TransactionManager;

@@ -1,5 +1,5 @@
-import { IdempotencyRepository } from './idempotency.repository';
-import { PrismaService } from '../prisma/prisma.service';
+import { IdempotencyRepository } from '../../src/balance/idempotency.repository';
+import { PrismaService } from '../../src/prisma/prisma.service';
 
 describe('IdempotencyRepository', () => {
   let repository: IdempotencyRepository;

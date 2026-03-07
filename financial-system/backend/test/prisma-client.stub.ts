@@ -19,6 +19,10 @@ export class PrismaClient {
     create: () => Promise.resolve(null),
   };
 
+  balanceSnapshot = {
+    create: () => Promise.resolve(null),
+  };
+
   idempotencyRecord = {
     findUnique: () => Promise.resolve(null),
     create: () => Promise.resolve(null),

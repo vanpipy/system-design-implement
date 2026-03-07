@@ -1,5 +1,5 @@
-import { BalanceRepository } from './balance.repository';
-import { PrismaService } from '../prisma/prisma.service';
+import { BalanceRepository } from '../../src/balance/balance.repository';
+import { PrismaService } from '../../src/prisma/prisma.service';
 
 describe('BalanceRepository', () => {
   let repository: BalanceRepository;
@@ -7,11 +7,13 @@ describe('BalanceRepository', () => {
   let findUnique: jest.Mock;
   let update: jest.Mock;
   let create: jest.Mock;
+  let createSnapshot: jest.Mock;
 
   beforeEach(() => {
     findUnique = jest.fn();
     update = jest.fn();
     create = jest.fn();
+    createSnapshot = jest.fn();
 
     prisma = {
       accountBalance: {
@@ -20,6 +22,9 @@ describe('BalanceRepository', () => {
       },
       balanceTransaction: {
         create,
+      },
+      balanceSnapshot: {
+        create: createSnapshot,
       },
     } as unknown as PrismaService;
 
@@ -63,6 +68,16 @@ describe('BalanceRepository', () => {
     await repository.createBalanceTransaction(data as never);
 
     expect(create).toHaveBeenCalledWith({
+      data,
+    });
+  });
+
+  it('should create BalanceSnapshot', async () => {
+    const data = { accountId: 'acc1' };
+
+    await repository.createBalanceSnapshot(data as never);
+
+    expect(createSnapshot).toHaveBeenCalledWith({
       data,
     });
   });

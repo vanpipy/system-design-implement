@@ -35,4 +35,10 @@ export class BalanceRepository {
       data,
     });
   }
+
+  createBalanceSnapshot(data: Prisma.BalanceSnapshotCreateInput) {
+    return this.prisma.balanceSnapshot.create({
+      data,
+    });
+  }
 }

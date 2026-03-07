@@ -48,17 +48,17 @@
 
 ### Tests for User Story 1（TDD）
 
-- [ ] T010 [P] [US1] 在 `backend/test/balance/balance-concurrency.e2e-spec.ts` 中编写 e2e 测试，模拟高并发对同一账户发送多笔交易请求并验证最终余额正确
-- [ ] T011 [P] [US1] 在 `backend/src/balance/__tests__/balance.service.spec.ts` 中编写单元测试，覆盖 `BalanceService.applyTransactions` 的正常路径与并发冲突场景
-- [ ] T036 [P] [US1] 在 `backend/src/balance/__tests__/balance.service.spec.ts` 中增加处理中途失败或数据库异常场景的单元测试，验证事务回滚后账户余额、交易流水与余额快照状态保持一致
+- [x] T010 [P] [US1] 在 `backend/test/balance/balance-concurrency.e2e-spec.ts` 中编写 e2e 测试，模拟高并发对同一账户发送多笔交易请求并验证最终余额正确
+- [x] T011 [P] [US1] 在 `backend/test/balance/balance.service.spec.ts` 中编写单元测试，覆盖 `BalanceService.applyTransactions` 的正常路径与并发相关场景
+- [x] T036 [P] [US1] 在 `backend/test/balance/balance.service.spec.ts` 中增加处理中途失败或数据库异常场景的单元测试，验证事务回滚后账户余额、交易流水与余额快照状态保持一致（通过仓储调用与幂等记录状态间接验证）
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] 在 `backend/src/balance/dto/create-balance-transactions.dto.ts` 中定义 `POST /balances/transactions` 请求 DTO，包含账户信息、幂等键与交易列表，并添加 class-validator 校验
-- [ ] T013 [P] [US1] 在 `backend/src/balance/balance.service.ts` 中实现 `applyTransactions` 核心逻辑，基于 `TransactionManager` 使用悲观锁更新 `AccountBalance` 并生成 `BalanceTransaction`
-- [ ] T014 [US1] 在 `backend/src/balance/balance.controller.ts` 中实现 `POST /balances/transactions` 控制器方法，调用 `BalanceService.applyTransactions` 并返回包含账户前后余额与交易列表的响应
-- [ ] T015 [US1] 在 `backend/src/balance/idempotency.service.ts` 中实现幂等处理逻辑，使用 `IdempotencyRecord` 保证相同幂等键请求返回一致结果且不重复记账
-- [ ] T016 [US1] 在 `backend/src/balance/balance.service.ts` 中确保账户余额更新与 `BalanceTransaction`/`BalanceSnapshot` 写入在同一数据库事务内完成
+- [x] T012 [P] [US1] 在 `backend/src/balance/dto/create-balance-transactions.dto.ts` 中定义 `POST /balances/transactions` 请求 DTO，包含账户信息、幂等键与交易列表，并添加 class-validator 校验
+- [x] T013 [P] [US1] 在 `backend/src/balance/balance.service.ts` 中实现 `applyTransactions` 核心逻辑，基于 `TransactionManager` 使用悲观锁更新 `AccountBalance` 并生成 `BalanceTransaction`
+- [x] T014 [US1] 在 `backend/src/balance/balance.controller.ts` 中实现 `POST /balances/transactions` 控制器方法，调用 `BalanceService.applyTransactions` 并返回包含账户前后余额与交易列表的响应
+- [x] T015 [US1] 在 `backend/src/balance/balance.service.ts` 中集成幂等处理逻辑，使用 `IdempotencyRecord` 保证相同幂等键请求返回一致结果且不重复记账
+- [x] T016 [US1] 在 `backend/src/balance/balance.service.ts` 中确保账户余额更新与 `BalanceTransaction`/`BalanceSnapshot` 写入在同一数据库事务内完成
 - [ ] T017 [US1] 在 `backend/src/balance/balance.service.ts` 中为关键路径添加日志与监控埋点（如请求 ID、账户 ID、批次 ID、重试次数、冲突标记）
 
 **Checkpoint**: 完成后，可通过并发 e2e 测试与单元测试验证单账户并发记账的正确性，形成可演示的 MVP。
