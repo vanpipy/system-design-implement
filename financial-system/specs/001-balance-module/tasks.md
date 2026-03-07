@@ -30,12 +30,12 @@
 **Purpose**: 为所有用户故事提供统一的账务模块基础结构与技术能力  
 **⚠️ CRITICAL**: 未完成前不可开始任何用户故事实现
 
-- [ ] T004 在 `backend/src/balance/balance.module.ts` 中创建 `BalanceModule` 并在 `backend/src/app.module.ts` 中完成模块注册
-- [ ] T005 [P] 在 `backend/src/balance/balance.repository.ts` 中实现基于 Prisma 的账户余额与交易流水仓储封装（读取/写入 AccountBalance 与 BalanceTransaction）
-- [ ] T006 [P] 在 `backend/src/balance/idempotency.repository.ts` 中实现 IdempotencyRecord 的读写接口
-- [ ] T007 在 `backend/src/balance/transaction-manager.ts` 中封装基于 Prisma 的事务与行级悲观锁操作（使用 `SELECT ... FOR UPDATE` 等等价机制）
-- [ ] T008 在 `backend/src/balance/balance.service.ts` 中定义余额领域服务接口与骨架方法（如 `applyTransactions`、`getBalance`）
-- [ ] T009 [P] 在 `backend/src/balance/balance.controller.ts` 中创建控制器骨架，并配置基础路由前缀 `/balances`
+- [x] T004 在 `backend/src/balance/balance.module.ts` 中创建 `BalanceModule` 并在 `backend/src/app.module.ts` 中完成模块注册
+- [x] T005 [P] 在 `backend/src/balance/balance.repository.ts` 中实现基于 Prisma 的账户余额与交易流水仓储封装（读取/写入 AccountBalance 与 BalanceTransaction）
+- [x] T006 [P] 在 `backend/src/balance/idempotency.repository.ts` 中实现 IdempotencyRecord 的读写接口
+- [x] T007 在 `backend/src/balance/transaction-manager.ts` 中封装基于 Prisma 的事务与行级悲观锁操作（使用 `SELECT ... FOR UPDATE` 等等价机制）
+- [x] T008 在 `backend/src/balance/balance.service.ts` 中定义余额领域服务接口与骨架方法（如 `applyTransactions`、`getBalance`）
+- [x] T009 [P] 在 `backend/src/balance/balance.controller.ts` 中创建控制器骨架，并配置基础路由前缀 `/balances`
 
 **Checkpoint**: 完成后，余额模块的基础结构与数据库访问能力准备就绪，可开始各用户故事的具体实现。
 
