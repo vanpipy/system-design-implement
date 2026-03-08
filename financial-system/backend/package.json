@@ -22,7 +22,14 @@
     "prisma:migrate:dev:pg": "prisma migrate dev --schema prisma/schema.prisma",
     "prisma:migrate:dev:sqlite": "prisma migrate dev --schema prisma/schema.sqlite.prisma",
     "prisma:studio:pg": "prisma studio --schema prisma/schema.prisma",
-    "prisma:studio:sqlite": "prisma studio --schema prisma/schema.sqlite.prisma"
+    "prisma:studio:sqlite": "prisma studio --schema prisma/schema.sqlite.prisma",
+    "dev:sqlite:prepare": "set DATABASE_URL=file:./dev.db&& prisma migrate dev --schema prisma/schema.sqlite.prisma && prisma generate --schema prisma/schema.sqlite.prisma",
+    "dev:sqlite": "npm run dev:sqlite:prepare && set DATABASE_URL=file:./dev.db&& npm run start:dev",
+    "verify:quickstart": "bash ./scripts/quickstart.sh",
+    "verify:quickstart:ps1": "powershell -ExecutionPolicy Bypass -File ./scripts/quickstart.ps1",
+    "verify:quickstart:bat": "cmd /c scripts\\quickstart.bat",
+    "dev:pg:prepare": "prisma migrate dev --schema prisma/schema.prisma && prisma generate --schema prisma/schema.prisma",
+    "dev:pg": "npm run dev:pg:prepare && npm run start:dev"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
