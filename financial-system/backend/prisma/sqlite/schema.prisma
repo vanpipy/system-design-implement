@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../../generated/prisma-sqlite"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model AccountBalance {
+  id            Int      @id @default(autoincrement())
+  accountId     String   @map("account_id")
+  accountType   String   @map("account_type")
+  currency      String
+  balance       Decimal  @default(0.0)
+  frozenBalance Decimal  @map("frozen_balance") @default(0.0)
+  totalBalance  Decimal  @map("total_balance")  @default(0.0)
+  minBalance    Decimal  @default(0.0) @map("min_balance")
+  status        String   @default("ACTIVE")
+  allowNegative Boolean  @default(false) @map("allow_negative")
+  version       Int      @default(0)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt      @map("updated_at")
+
+  @@map("account_balance")
+  @@unique([accountId, accountType, currency], name: "uk_account_balance_account")
+  @@index([accountId, accountType, currency], name: "idx_account_balance_account")
+  @@index([status], name: "idx_account_balance_status")
+}
+
+model BalanceTransaction {
+  id                  Int      @id @default(autoincrement())
+  transactionNo       String   @map("transaction_no")
+  idempotencyKey      String?  @map("idempotency_key")
+  requestId           String   @map("request_id")
+  batchId             String   @map("batch_id")
+  accountId           String   @map("account_id")
+  accountType         String   @map("account_type")
+  currency            String
+  transactionType     String   @map("transaction_type")
+  direction           String
+  amount              Decimal
+  beforeBalance       Decimal  @map("before_balance")
+  afterBalance        Decimal  @map("after_balance")
+  oppositeAccount     String?  @map("opposite_account")
+  oppositeAccountType String?  @map("opposite_account_type")
+  businessRefNo       String?  @map("business_ref_no")
+  status              String   @default("PENDING")
+  errorCode           String?  @map("error_code")
+  errorMessage        String?  @map("error_message")
+  lockType            String   @map("lock_type")
+  retryCount          Int      @default(0)       @map("retry_count")
+  conflictDetected    Boolean  @default(false)   @map("conflict_detected")
+  transactionTime     DateTime @default(now())   @map("transaction_time")
+  createdAt           DateTime @default(now())   @map("created_at")
+  updatedAt           DateTime @updatedAt        @map("updated_at")
+  accountingDate      DateTime @default(dbgenerated("CURRENT_DATE")) @map("accounting_date")
+  metadata            Json?    @map("metadata")
+  clientInfo          Json?    @map("client_info")
+  reconciled          Boolean  @default(false)
+  reconciledAt        DateTime? @map("reconciled_at")
+
+  @@map("transaction_journal")
+  @@unique([transactionNo], name: "uk_transaction_no")
+  @@unique([accountId, accountType, currency, idempotencyKey], name: "uk_balance_tx_account_idempotency_key")
+  @@index([accountId, accountingDate, createdAt], name: "idx_journal_account_date")
+  @@index([accountId, accountType, currency, transactionTime], name: "idx_journal_account_type_currency_time")
+  @@index([idempotencyKey], name: "idx_journal_idempotency")
+  @@index([status, createdAt], name: "idx_journal_status")
+  @@index([conflictDetected, createdAt], name: "idx_journal_conflict")
+  @@index([reconciled, accountingDate], name: "idx_journal_reconciliation")
+  @@index([businessRefNo], name: "idx_journal_business_ref")
+}
+
+model BalanceSnapshot {
+  id            Int      @id @default(autoincrement())
+  accountId     String   @map("account_id")
+  accountType   String   @map("account_type")
+  currency      String
+  requestId     String   @map("request_id")
+  beforeBalance Decimal  @map("before_balance")
+  afterBalance  Decimal  @map("after_balance")
+  status        String
+  accountingDate DateTime @default(dbgenerated("CURRENT_DATE")) @map("accounting_date")
+  createdAt     DateTime @default(now()) @map("created_at")
+  metadata      Json?    @map("metadata")
+
+  @@map("balance_snapshot")
+  @@unique([accountId, accountType, currency, requestId], name: "uk_balance_snapshot_account_request")
+  @@index([accountId, accountingDate, createdAt], name: "idx_snapshot_account_date")
+  @@index([accountId, accountType, currency, accountingDate], name: "idx_snapshot_account_type_currency_date")
+  @@index([requestId], name: "idx_snapshot_request")
+  @@index([status, createdAt], name: "idx_snapshot_status")
+}
+
+model IdempotencyRecord {
+  id             Int      @id @default(autoincrement())
+  idempotencyKey String   @map("idempotency_key")
+  requestHash    String   @map("request_hash")
+  status         String
+  responseData   Json?    @map("response_data")
+  errorInfo      Json?    @map("error_info")
+  metadata       Json?    @map("metadata")
+  transactionNo  String?  @map("transaction_no")
+  expiredAt      DateTime @map("expired_at")
+  createdAt      DateTime @default(now())  @map("created_at")
+  updatedAt      DateTime @updatedAt       @map("updated_at")
+
+  @@map("idempotency_record")
+  @@unique([idempotencyKey, requestHash], name: "uk_idempotency_key_hash")
+  @@index([expiredAt], name: "idx_idempotency_expired")
+  @@index([createdAt], name: "idx_idempotency_cleanup")
+}

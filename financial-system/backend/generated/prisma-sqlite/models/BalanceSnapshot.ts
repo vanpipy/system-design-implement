@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model BalanceSnapshot
- * 余额快照表（记录请求前后余额状态及关联信息）
+ * 
  */
 export type BalanceSnapshotModel = runtime.Types.Result.DefaultSelection<Prisma.$BalanceSnapshotPayload>
 
@@ -1206,7 +1206,6 @@ export type BalanceSnapshotCreateManyArgs<ExtArgs extends runtime.Types.Extensio
    * The data used to create many BalanceSnapshots.
    */
   data: Prisma.BalanceSnapshotCreateManyInput | Prisma.BalanceSnapshotCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -1225,7 +1224,6 @@ export type BalanceSnapshotCreateManyAndReturnArgs<ExtArgs extends runtime.Types
    * The data used to create many BalanceSnapshots.
    */
   data: Prisma.BalanceSnapshotCreateManyInput | Prisma.BalanceSnapshotCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**

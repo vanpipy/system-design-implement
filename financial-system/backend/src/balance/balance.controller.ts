@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  UseFilters,
   Post,
   Query,
   Res,
@@ -15,7 +16,9 @@ import { CreateBalanceTransactionsDto } from './dto/create-balance-transactions.
 import { SnapshotService } from './snapshot.service';
 import { TransactionQueryService } from './transaction-query.service';
 import { BatchBalanceQueryDto } from './dto/batch-balance-query.dto';
+import { BalanceExceptionFilter } from './balance-exception.filter';
 
+@UseFilters(BalanceExceptionFilter)
 @Controller('balances')
 export class BalanceController {
   constructor(

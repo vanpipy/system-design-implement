@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model IdempotencyRecord
- * 幂等记录表（独立管理幂等键生命周期）
+ * 
  */
 export type IdempotencyRecordModel = runtime.Types.Result.DefaultSelection<Prisma.$IdempotencyRecordPayload>
 
@@ -1180,7 +1180,6 @@ export type IdempotencyRecordCreateManyArgs<ExtArgs extends runtime.Types.Extens
    * The data used to create many IdempotencyRecords.
    */
   data: Prisma.IdempotencyRecordCreateManyInput | Prisma.IdempotencyRecordCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -1199,7 +1198,6 @@ export type IdempotencyRecordCreateManyAndReturnArgs<ExtArgs extends runtime.Typ
    * The data used to create many IdempotencyRecords.
    */
   data: Prisma.IdempotencyRecordCreateManyInput | Prisma.IdempotencyRecordCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**

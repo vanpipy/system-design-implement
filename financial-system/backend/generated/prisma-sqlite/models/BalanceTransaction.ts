@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model BalanceTransaction
- * 交易流水表（所有账务变动的原始记录）
+ * 
  */
 export type BalanceTransactionModel = runtime.Types.Result.DefaultSelection<Prisma.$BalanceTransactionPayload>
 
@@ -1752,7 +1752,6 @@ export type BalanceTransactionCreateManyArgs<ExtArgs extends runtime.Types.Exten
    * The data used to create many BalanceTransactions.
    */
   data: Prisma.BalanceTransactionCreateManyInput | Prisma.BalanceTransactionCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -1771,7 +1770,6 @@ export type BalanceTransactionCreateManyAndReturnArgs<ExtArgs extends runtime.Ty
    * The data used to create many BalanceTransactions.
    */
   data: Prisma.BalanceTransactionCreateManyInput | Prisma.BalanceTransactionCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**

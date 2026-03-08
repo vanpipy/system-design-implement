@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model AccountBalance
- * 账户余额表（核心账务数据）
+ * 
  */
 export type AccountBalanceModel = runtime.Types.Result.DefaultSelection<Prisma.$AccountBalancePayload>
 
@@ -1313,7 +1313,6 @@ export type AccountBalanceCreateManyArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many AccountBalances.
    */
   data: Prisma.AccountBalanceCreateManyInput | Prisma.AccountBalanceCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -1332,7 +1331,6 @@ export type AccountBalanceCreateManyAndReturnArgs<ExtArgs extends runtime.Types.
    * The data used to create many AccountBalances.
    */
   data: Prisma.AccountBalanceCreateManyInput | Prisma.AccountBalanceCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**

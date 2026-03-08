@@ -41,21 +41,114 @@ Create a `.env` file in the `backend` 目录，最少包含数据库连接配置
 DATABASE_URL="postgresql://user:password@localhost:5432/financial_system"
 ```
 
-本地开发可以使用 PostgreSQL 或 SQLite，二者通过 Prisma 切换:
+本地开发可在 PostgreSQL 与 SQLite 间切换，运行时由 `DATABASE_URL` 决定:
 
-- PostgreSQL: 在 `prisma/schema.prisma` 的 `datasource db` 中保持 `provider = "postgresql"`，并将 `DATABASE_URL` 指向本地 Postgres 实例。
-- SQLite: 将 `provider` 改为 `"sqlite"`，并设置 `DATABASE_URL="file:./dev.db"`。
+- 当 `DATABASE_URL` 以 `file:` 开头时，服务自动使用 SQLite 客户端
+- 其它情况使用 PostgreSQL 客户端
+- 不需要改业务代码即可切换
 
 修改 provider 后需重新生成 Prisma Client。
+
+### 快速启动（SQLite）
+
+```bash
+# 迁移与生成（自动创建 dev.db 并生成 sqlite 客户端）
+npm run dev:sqlite:prepare
+
+# 启动（已为你设置 DATABASE_URL=file:./dev.db）
+npm run dev:sqlite
+
+# 一键调用验证（任选其一）
+npm run verify:quickstart          # PowerShell
+npm run verify:quickstart:bat      # CMD
+npm run verify:quickstart:sh       # Bash（Linux/macOS）
+```
+
+### 快速启动（PostgreSQL）
+
+准备数据库并设置连接串，例如：
+
+```bash
+# backend/.env
+DATABASE_URL="postgresql://user:password@localhost:5432/financial_system?schema=public"
+```
+
+然后执行迁移与启动：
+
+```bash
+# 同步数据库结构并生成 pg 客户端
+npm run dev:pg:prepare
+
+# 启动（确保环境中 DATABASE_URL 指向你的 PostgreSQL 实例）
+npm run start:dev
+```
+
+你也可以直接：
+
+```bash
+# 仅迁移与生成
+npm run prisma:migrate:dev:pg
+npm run prisma:generate
+```
+
+### 手动接口验证示例
+
+提交交易：
+
+```bash
+curl -X POST http://localhost:3000/balances/transactions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requestId": "REQ-README-1",
+    "idempotencyKey": "IDEMP-README-1",
+    "account": { "accountId": "ACC-README", "accountType": "CASH", "currency": "CNY" },
+    "transactions": [
+      { "transactionType": "DEPOSIT", "direction": "CREDIT", "amount": "10.00" }
+    ]
+  }'
+```
+
+批量查询余额（POST /balances）：
+
+```bash
+curl -X POST http://localhost:3000/balances \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accounts": [
+      { "accountId": "ACC-README", "accountType": "CASH", "currency": "CNY" }
+    ]
+  }'
+```
+
+### Error Codes（Balance）
+
+- INVALID_PARAMS：请求缺少必填参数或参数格式不合法
+- NOT_FOUND：资源不存在
+- INSUFFICIENT_FUNDS：超扣策略触发导致请求被拒绝
+- INTERNAL_ERROR：服务内部错误
 
 ### Prisma migrations
 
 每次调整数据模型后，使用 Prisma 迁移同步数据库结构:
 
 ```bash
-npx prisma migrate dev --name init_balance_models
-npx prisma generate
+# PostgreSQL
+npm run prisma:migrate:dev:pg
+npm run prisma:generate
+
+# SQLite（已拆分独立 schema 与 migrations）
+DATABASE_URL="file:./dev.db" npx prisma migrate dev --schema prisma/sqlite/schema.prisma
+DATABASE_URL="file:./dev.db" npx prisma generate --schema prisma/sqlite/schema.prisma
 ```
+
+### 安全建议（数据库连接）
+
+- 避免将包含用户名和密码的完整 `DATABASE_URL` 提交到代码库
+- 推荐在本地使用 `.env`（确保 `.env` 已在 `.gitignore`），在 CI/生产使用环境变量注入或机密管理器（Kubernetes Secret、GitHub Actions Secrets、Azure Key Vault 等）
+- 支持使用分散变量而不是 URL：
+  - `PGHOST`、`PGPORT`、`PGDATABASE`、`PGUSER`、`PGPASSWORD`、`PGSCHEMA`
+  - 当未提供 `DATABASE_URL` 时，服务会在启动时根据上述变量自动拼接连接串，无需在磁盘上保存明文 URL
+- 日志与错误返回已做敏感信息脱敏，避免泄露凭据
 
 ### Start application
 
