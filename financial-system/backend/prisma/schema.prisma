@@ -169,6 +169,9 @@ model BalanceTransaction {
   /// 按账户 + 会计日期查询的索引
   @@index([accountId, accountingDate, createdAt], name: "idx_journal_account_date")
 
+  /// 按账户+类型+币种+交易时间查询索引（覆盖 /balances/transactions 查询）
+  @@index([accountId, accountType, currency, transactionTime], name: "idx_journal_account_type_currency_time")
+
   /// 幂等键查询索引（仅非空在数据库层为部分索引，此处为普通索引）
   @@index([idempotencyKey], name: "idx_journal_idempotency")
 
@@ -227,6 +230,9 @@ model BalanceSnapshot {
 
   /// 按账户 + 会计日期查询快照
   @@index([accountId, accountingDate, createdAt], name: "idx_snapshot_account_date")
+
+  /// 按账户+类型+币种+会计日期查询快照（覆盖账户维度区间查询）
+  @@index([accountId, accountType, currency, accountingDate], name: "idx_snapshot_account_type_currency_date")
 
   /// 按请求 ID 查询快照
   @@index([requestId], name: "idx_snapshot_request")
