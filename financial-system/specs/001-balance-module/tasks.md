@@ -128,9 +128,9 @@
 - [x] T033 [P] 为 `backend/src/balance/` 中的关键服务（如 `BalanceService`、`SnapshotService`）补充更多单元测试，提高覆盖率
 - [ ] T034 [P] 针对高并发热点账户和大批量查询场景，在 `backend/prisma/schema.prisma` 和数据库层评估并优化索引（如快照/流水查询索引）
 - [ ] T035 对余额模块进行一次端到端的 quickstart 验证，根据 `backend/README.md` 与未来的 `quickstart.md` 说明执行本地启动、迁移、并发测试与查询流程
-- [ ] T037 [P] 在 `backend/src/balance/idempotency-cleanup.service.ts` 中实现基于 `expiredAt` 或创建时间的幂等记录清理服务，确保只清理已过期且不再需要重放的记录
-- [ ] T038 在 `backend/test/balance/idempotency-cleanup.e2e-spec.ts` 中编写 e2e 测试，验证幂等清理任务不会影响已落账的交易流水与余额快照查询能力
-- [ ] T039 [P] 在 `backend/src/balance/` 中统一错误响应模型与敏感信息日志策略，避免在日志与对外响应中暴露账户标识、幂等键等敏感字段，并在现有 e2e 测试中覆盖典型失败场景
+- [x] T036 [P] 在 `backend/src/balance/idempotency-cleanup.service.ts` 中实现基于 `expiredAt` 或创建时间的幂等记录清理服务，确保只清理已过期且不再需要重放的记录
+- [x] T037 在 `backend/test/balance/idempotency-cleanup.e2e-spec.ts` 中编写 e2e 测试，验证幂等清理任务不会影响已落账的交易流水与余额快照查询能力
+- [x] T038 [P] 在 `backend/src/balance/` 中统一错误响应模型与敏感信息日志策略，避免在日志与对外响应中暴露账户标识、幂等键等敏感字段，并在现有 e2e 测试中覆盖典型失败场景
 
 ---
 

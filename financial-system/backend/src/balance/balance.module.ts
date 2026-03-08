@@ -7,6 +7,7 @@ import { IdempotencyRepository } from './idempotency.repository';
 import { TransactionManager } from './transaction-manager';
 import { SnapshotService } from './snapshot.service';
 import { TransactionQueryService } from './transaction-query.service';
+import { IdempotencyCleanupService } from './idempotency-cleanup.service';
 
 @Module({
   imports: [PrismaModule],
@@ -18,6 +19,7 @@ import { TransactionQueryService } from './transaction-query.service';
     TransactionManager,
     SnapshotService,
     TransactionQueryService,
+    IdempotencyCleanupService,
   ],
   exports: [BalanceService],
 })

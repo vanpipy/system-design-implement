@@ -12,6 +12,19 @@ import type { Response } from 'express';
 export class BalanceExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger('BalanceExceptionFilter');
 
+  private sanitize(input: string) {
+    if (!input) return input;
+    return input
+      .replace(
+        /(idempotencyKey|accountId|requestId)\s*[:=]\s*([A-Za-z0-9_\-:]+)/gi,
+        (_m, k) => `${k}=[REDACTED]`,
+      )
+      .replace(
+        /"(idempotencyKey|accountId|requestId)"\s*:\s*"[^"]*"/gi,
+        (_m, k) => `"${k}":"[REDACTED]"`,
+      );
+  }
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -34,17 +47,18 @@ export class BalanceExceptionFilter implements ExceptionFilter {
             ? 'NOT_FOUND'
             : 'ERROR';
 
-      this.logger.error(`${errorCode} ${status} ${msg}`);
+      const safeMsg = this.sanitize(msg);
+      this.logger.error(`${errorCode} ${status} ${safeMsg}`);
       response.status(status).json({
         errorCode,
-        message: msg || exception.message,
+        message: safeMsg || 'Request failed',
       });
       return;
     }
 
-    this.logger.error(
-      `INTERNAL_ERROR 500 ${(exception as Error)?.message ?? ''}`,
-    );
+    const em = (exception as Error)?.message ?? '';
+    const safeEm = this.sanitize(em);
+    this.logger.error(`INTERNAL_ERROR 500 ${safeEm}`);
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       errorCode: 'INTERNAL_ERROR',
       message: 'Internal server error',
