@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import type { Prisma } from '../../generated/prisma/client';
+import { PrismaService } from '@/prisma/prisma.service';
+import type { Prisma } from '@/prisma/prisma.types';
 
 @Injectable()
 export class IdempotencyCleanupService {

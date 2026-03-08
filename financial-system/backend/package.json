@@ -19,16 +19,16 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:generate": "prisma generate",
-    "prisma:migrate:dev:pg": "prisma migrate dev --schema prisma/schema.prisma",
-    "prisma:migrate:dev:sqlite": "prisma migrate dev --schema prisma/schema.sqlite.prisma",
-    "prisma:studio:pg": "prisma studio --schema prisma/schema.prisma",
-    "prisma:studio:sqlite": "prisma studio --schema prisma/schema.sqlite.prisma",
-    "dev:sqlite:prepare": "cross-env DATABASE_URL=file:./dev.db prisma migrate dev --schema prisma/schema.sqlite.prisma && cross-env DATABASE_URL=file:./dev.db prisma generate --schema prisma/schema.sqlite.prisma",
+    "prisma:migrate:dev:pg": "prisma migrate dev --schema prisma/pg/schema.prisma",
+    "prisma:migrate:dev:sqlite": "prisma migrate dev --schema prisma/sqlite/schema.prisma",
+    "prisma:studio:pg": "prisma studio --schema prisma/pg/schema.prisma",
+    "prisma:studio:sqlite": "prisma studio --schema prisma/sqlite/schema.prisma",
+    "dev:sqlite:prepare": "cross-env DATABASE_URL=file:./dev.db prisma migrate dev --schema prisma/sqlite/schema.prisma && cross-env DATABASE_URL=file:./dev.db prisma generate --schema prisma/sqlite/schema.prisma",
     "dev:sqlite": "npm run dev:sqlite:prepare && cross-env DATABASE_URL=file:./dev.db npm run start:dev",
     "verify:quickstart": "bash ./scripts/quickstart.sh",
     "verify:quickstart:ps1": "powershell -ExecutionPolicy Bypass -File ./scripts/quickstart.ps1",
     "verify:quickstart:bat": "cmd /c scripts\\quickstart.bat",
-    "dev:pg:prepare": "prisma migrate dev --schema prisma/schema.prisma && prisma generate --schema prisma/schema.prisma",
+    "dev:pg:prepare": "prisma migrate dev --schema prisma/pg/schema.prisma && prisma generate --schema prisma/pg/schema.prisma",
     "dev:pg": "npm run dev:pg:prepare && npm run start:dev"
   },
   "dependencies": {
@@ -86,7 +86,8 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "generated/prisma/client$": "<rootDir>/test/prisma-client.stub.ts"
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^root/generated/prisma/client$": "<rootDir>/test/prisma-client.stub.ts"
     }
   },
   "eslintConfig": {

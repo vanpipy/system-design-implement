@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { PrismaClient as PgPrismaClient } from '../../generated/prisma/client';
+import type { PrismaClient as PgPrismaClient } from 'root/generated/prisma/client';
 import { createRequire } from 'module';
 
 @Injectable()
@@ -24,12 +24,12 @@ export class PrismaService {
     const url = process.env.DATABASE_URL ?? '';
     const useSqlite = url.startsWith('file:');
     if (useSqlite) {
-      const { PrismaClient } = req('../../generated/prisma-sqlite/client');
+      const { PrismaClient } = req('root/generated/prisma-sqlite/client');
       this.client = new (PrismaClient as unknown as {
         new (): PgPrismaClient;
       })();
     } else {
-      const { PrismaClient } = req('../../generated/prisma/client');
+      const { PrismaClient } = req('root/generated/prisma/client');
       this.client = new (PrismaClient as unknown as {
         new (): PgPrismaClient;
       })();
@@ -50,6 +50,10 @@ export class PrismaService {
   }
 
   $transaction<T>(fn: (tx: unknown) => Promise<T>): Promise<T> {
-    return (this.client as unknown as { $transaction: (cb: (tx: unknown) => Promise<T>) => Promise<T> }).$transaction(fn);
+    return (
+      this.client as unknown as {
+        $transaction: (cb: (tx: unknown) => Promise<T>) => Promise<T>;
+      }
+    ).$transaction(fn);
   }
 }
