@@ -12,8 +12,12 @@ DATABASE_URL="file:./dev.db"
 
 ```bash
 cd backend
-npx prisma migrate dev --name init_balance_models
-npx prisma generate
+# 推荐：使用项目脚本（自动指定 sqlite schema）
+npm run dev:sqlite:prepare
+
+# 或者手动指定 schema（等效）
+DATABASE_URL="file:./dev.db" npx prisma migrate dev --schema prisma/schema.sqlite.prisma
+DATABASE_URL="file:./dev.db" npx prisma generate --schema prisma/schema.sqlite.prisma
 ```
 
 ## 启动服务
@@ -92,4 +96,3 @@ curl "http://localhost:3000/balances/snapshots?requestId=REQ-QUICKSTART-1"
 ```bash
 curl "http://localhost:3000/balances/transactions?accountId=ACC-QS-1&accountType=CASH&currency=CNY"
 ```
-

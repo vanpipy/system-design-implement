@@ -8,6 +8,7 @@ import { IdempotencyCleanupService } from '../../src/balance/idempotency-cleanup
 describe('IdempotencyCleanup (e2e)', () => {
   let app: INestApplication<App>;
   let cleanup: IdempotencyCleanupService;
+  const suffix = `-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -20,9 +21,13 @@ describe('IdempotencyCleanup (e2e)', () => {
     cleanup = app.get(IdempotencyCleanupService);
   });
 
+  afterEach(async () => {
+    await app.close();
+  });
+
   it('should not affect transactions and snapshots after cleanup', async () => {
     const account = {
-      accountId: 'ACC-CLEANUP-E2E',
+      accountId: `ACC-CLEANUP-E2E${suffix}`,
       accountType: 'CASH',
       currency: 'CNY',
     };
@@ -30,8 +35,8 @@ describe('IdempotencyCleanup (e2e)', () => {
     const depositRes = await request(app.getHttpServer())
       .post('/balances/transactions')
       .send({
-        requestId: 'REQ-CLEANUP-1',
-        idempotencyKey: 'IDEMP-CLEANUP-1',
+        requestId: `REQ-CLEANUP-1${suffix}`,
+        idempotencyKey: `IDEMP-CLEANUP-1${suffix}`,
         account,
         transactions: [
           { transactionType: 'DEPOSIT', direction: 'CREDIT', amount: '50.00' },
@@ -43,8 +48,8 @@ describe('IdempotencyCleanup (e2e)', () => {
     const paymentRes = await request(app.getHttpServer())
       .post('/balances/transactions')
       .send({
-        requestId: 'REQ-CLEANUP-2',
-        idempotencyKey: 'IDEMP-CLEANUP-2',
+        requestId: `REQ-CLEANUP-2${suffix}`,
+        idempotencyKey: `IDEMP-CLEANUP-2${suffix}`,
         account,
         transactions: [
           { transactionType: 'PAYMENT', direction: 'DEBIT', amount: '10.00' },
@@ -61,7 +66,7 @@ describe('IdempotencyCleanup (e2e)', () => {
 
     const beforeSnapshots = await request(app.getHttpServer())
       .get('/balances/snapshots')
-      .query({ requestId: 'REQ-CLEANUP-1' });
+      .query({ requestId: `REQ-CLEANUP-1${suffix}` });
     expect(beforeSnapshots.status).toBe(200);
     expect(beforeSnapshots.body.items.length).toBeGreaterThan(0);
 
@@ -76,7 +81,7 @@ describe('IdempotencyCleanup (e2e)', () => {
 
     const afterSnapshots = await request(app.getHttpServer())
       .get('/balances/snapshots')
-      .query({ requestId: 'REQ-CLEANUP-1' });
+      .query({ requestId: `REQ-CLEANUP-1${suffix}` });
     expect(afterSnapshots.status).toBe(200);
     expect(afterSnapshots.body.items.length).toBeGreaterThan(0);
   });
