@@ -134,7 +134,7 @@ export class BalanceService {
           }
 
           for (let i = 0; i < dto.transactions.length; i++) {
-            const item = dto.transactions[i]!;
+            const item = dto.transactions[i];
             const amount = new Decimal(item.amount);
             const txBefore = currentBalance;
             const txAfter =

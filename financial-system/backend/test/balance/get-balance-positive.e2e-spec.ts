@@ -4,7 +4,7 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { AppModule } from '../../src/app.module';
 
-describe('GET /balances positive case (e2e)', () => {
+describe('POST /balances positive case (e2e)', () => {
   let app: INestApplication;
   let http: App;
 
@@ -22,8 +22,12 @@ describe('GET /balances positive case (e2e)', () => {
     await app.close();
   });
 
-  it('should return 200 and stringified fields for an existing account', async () => {
-    const account = { accountId: 'ACC-POS', accountType: 'CASH', currency: 'CNY' };
+  it('should return 200 and stringified fields for existing accounts (batch)', async () => {
+    const account = {
+      accountId: 'ACC-POS',
+      accountType: 'CASH',
+      currency: 'CNY',
+    };
 
     // Seed by creating a deposit via transactions endpoint
     const postRes = await request(http)
@@ -43,20 +47,38 @@ describe('GET /balances positive case (e2e)', () => {
     expect([200, 201]).toContain(postRes.status);
     expect(postRes.body?.status).toBe('SUCCESS');
 
-    // Query balance
-    const res = await request(http).get('/balances').query(account);
+    // Batch query: include an existing account and a non-existent one
+    const res = await request(http)
+      .post('/balances')
+      .send({
+        accounts: [
+          account,
+          { accountId: 'ACC-NOT-EXIST', accountType: 'CASH', currency: 'CNY' },
+        ],
+      });
     expect(res.status).toBe(200);
-    expect(res.body.accountId).toBe('ACC-POS');
-    expect(res.body.accountType).toBe('CASH');
-    expect(res.body.currency).toBe('CNY');
-    expect(res.body.balance).toBe('12.34');
-    expect(['0.00', '0']).toContain(res.body.frozenBalance);
-    expect(res.body.totalBalance).toBe('12.34');
-    expect(res.body.minBalance).toBe('0.00');
-    expect(res.body.status).toBe('ACTIVE');
-    expect(res.body.allowNegative).toBe(false);
+    expect(Array.isArray(res.body.items)).toBe(true);
+    expect(res.body.items.length).toBe(2);
+    const found = res.body.items[0];
+    expect(found.accountId).toBe('ACC-POS');
+    expect(found.accountType).toBe('CASH');
+    expect(found.currency).toBe('CNY');
+    expect(found.balance).toBe('12.34');
+    expect(['0.00', '0']).toContain(found.frozenBalance);
+    expect(found.totalBalance).toBe('12.34');
+    expect(found.minBalance).toBe('0.00');
+    expect(found.status).toBe('ACTIVE');
+    expect(found.allowNegative).toBe(false);
     expect(
-      typeof res.body.updatedAt === 'string' || res.body.updatedAt === undefined,
+      typeof found.updatedAt === 'string' || found.updatedAt === undefined,
     ).toBe(true);
+
+    const notFound = res.body.items[1];
+    expect(notFound).toMatchObject({
+      accountId: 'ACC-NOT-EXIST',
+      accountType: 'CASH',
+      currency: 'CNY',
+      status: 'NOT_FOUND',
+    });
   });
 });
