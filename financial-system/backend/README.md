@@ -136,9 +136,9 @@ curl -X POST http://localhost:3000/balances \
 npm run prisma:migrate:dev:pg
 npm run prisma:generate
 
-# SQLite（指定 sqlite schema）
-DATABASE_URL="file:./dev.db" npx prisma migrate dev --schema prisma/schema.sqlite.prisma
-DATABASE_URL="file:./dev.db" npx prisma generate --schema prisma/schema.sqlite.prisma
+# SQLite（已拆分独立 schema 与 migrations）
+DATABASE_URL="file:./dev.db" npx prisma migrate dev --schema prisma/sqlite/schema.prisma
+DATABASE_URL="file:./dev.db" npx prisma generate --schema prisma/sqlite/schema.prisma
 ```
 
 ### 安全建议（数据库连接）

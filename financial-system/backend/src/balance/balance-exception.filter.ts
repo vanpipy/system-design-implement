@@ -23,7 +23,10 @@ export class BalanceExceptionFilter implements ExceptionFilter {
         /"(idempotencyKey|accountId|requestId)"\s*:\s*"[^"]*"/gi,
         (_m, k) => `"${k}":"[REDACTED]"`,
       )
-      .replace(/(DATABASE_URL)\s*[:=]\s*([^\s"']+)/gi, (_m, k) => `${k}=[REDACTED]`)
+      .replace(
+        /(DATABASE_URL)\s*[:=]\s*([^\s"']+)/gi,
+        (_m, k) => `${k}=[REDACTED]`,
+      )
       .replace(/:\/\/([^:\s]+):([^@]+)@/g, '://$1:[REDACTED]@')
       .replace(/"password"\s*:\s*"[^"]*"/gi, '"password":"[REDACTED]"');
   }

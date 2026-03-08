@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
+import type { Prisma } from '@/prisma/prisma.types';
 
 @Injectable()
 export class IdempotencyCleanupService {
@@ -7,12 +8,13 @@ export class IdempotencyCleanupService {
 
   async cleanExpired(): Promise<{ count: number }> {
     const now = new Date();
-    const result = await this.prisma.idempotencyRecord.deleteMany({
-      where: {
-        expiredAt: { lt: now },
-        NOT: { status: 'PROCESSING' },
-      },
-    } as never);
-    return { count: (result as { count: number }).count ?? 0 };
+    const result: Prisma.BatchPayload =
+      await this.prisma.idempotencyRecord.deleteMany({
+        where: {
+          expiredAt: { lt: now },
+          NOT: { status: 'PROCESSING' },
+        },
+      } as Prisma.IdempotencyRecordDeleteManyArgs);
+    return { count: result.count };
   }
 }

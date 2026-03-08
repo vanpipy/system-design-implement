@@ -35,7 +35,7 @@ export class BalanceService {
       dto.idempotencyKey,
       requestHash,
       expiredAt,
-      async () =>
+      () =>
         this.transactionManager.runInTransaction(async (tx) => {
           await this.transactionManager.lockAccountBalanceRow(tx, {
             accountId,

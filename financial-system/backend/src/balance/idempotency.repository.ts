@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '../../generated/prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import type { Prisma } from '@/prisma/prisma.types';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
 export class IdempotencyRepository {

@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma-sqlite"
+  output   = "../../generated/prisma-sqlite"
 }
 
 datasource db {
@@ -49,12 +49,12 @@ model BalanceTransaction {
   errorCode           String?  @map("error_code")
   errorMessage        String?  @map("error_message")
   lockType            String   @map("lock_type")
-  retryCount          Int      @default(0) @map("retry_count")
-  conflictDetected    Boolean  @default(false) @map("conflict_detected")
-  transactionTime     DateTime @default(now()) @map("transaction_time")
-  createdAt           DateTime @default(now()) @map("created_at")
-  updatedAt           DateTime @updatedAt      @map("updated_at")
-  accountingDate      DateTime @default(now()) @map("accounting_date")
+  retryCount          Int      @default(0)       @map("retry_count")
+  conflictDetected    Boolean  @default(false)   @map("conflict_detected")
+  transactionTime     DateTime @default(now())   @map("transaction_time")
+  createdAt           DateTime @default(now())   @map("created_at")
+  updatedAt           DateTime @updatedAt        @map("updated_at")
+  accountingDate      DateTime @default(dbgenerated("CURRENT_DATE")) @map("accounting_date")
   metadata            Json?    @map("metadata")
   clientInfo          Json?    @map("client_info")
   reconciled          Boolean  @default(false)
@@ -73,17 +73,17 @@ model BalanceTransaction {
 }
 
 model BalanceSnapshot {
-  id             Int      @id @default(autoincrement())
-  accountId      String   @map("account_id")
-  accountType    String   @map("account_type")
-  currency       String
-  requestId      String   @map("request_id")
-  beforeBalance  Decimal  @map("before_balance")
-  afterBalance   Decimal  @map("after_balance")
-  status         String
-  accountingDate DateTime @default(now()) @map("accounting_date")
-  createdAt      DateTime @default(now()) @map("created_at")
-  metadata       Json?    @map("metadata")
+  id            Int      @id @default(autoincrement())
+  accountId     String   @map("account_id")
+  accountType   String   @map("account_type")
+  currency      String
+  requestId     String   @map("request_id")
+  beforeBalance Decimal  @map("before_balance")
+  afterBalance  Decimal  @map("after_balance")
+  status        String
+  accountingDate DateTime @default(dbgenerated("CURRENT_DATE")) @map("accounting_date")
+  createdAt     DateTime @default(now()) @map("created_at")
+  metadata      Json?    @map("metadata")
 
   @@map("balance_snapshot")
   @@unique([accountId, accountType, currency, requestId], name: "uk_balance_snapshot_account_request")
@@ -103,8 +103,8 @@ model IdempotencyRecord {
   metadata       Json?    @map("metadata")
   transactionNo  String?  @map("transaction_no")
   expiredAt      DateTime @map("expired_at")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt      @map("updated_at")
+  createdAt      DateTime @default(now())  @map("created_at")
+  updatedAt      DateTime @updatedAt       @map("updated_at")
 
   @@map("idempotency_record")
   @@unique([idempotencyKey, requestHash], name: "uk_idempotency_key_hash")

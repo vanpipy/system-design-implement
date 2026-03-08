@@ -1,3 +1,4 @@
+-- Copied from original sqlite migration
 -- CreateTable
 CREATE TABLE "account_balance" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -135,6 +136,3 @@ CREATE INDEX "idx_idempotency_expired" ON "idempotency_record"("expired_at");
 
 -- CreateIndex
 CREATE INDEX "idx_idempotency_cleanup" ON "idempotency_record"("created_at");
-
--- CreateIndex
-CREATE UNIQUE INDEX "idempotency_record_idempotency_key_request_hash_key" ON "idempotency_record"("idempotency_key", "request_hash");
