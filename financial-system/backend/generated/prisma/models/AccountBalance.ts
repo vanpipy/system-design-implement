@@ -659,18 +659,57 @@ export type $AccountBalancePayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "AccountBalance"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    /**
+     * 主键标识（自增 ID）
+     */
     id: number
+    /**
+     * 账户号（业务主键）
+     */
     accountId: string
+    /**
+     * 账户类型：CASH(现金)/MARGIN(保证金)/FROZEN(冻结)
+     */
     accountType: string
+    /**
+     * 币种：CNY / USD 等
+     */
     currency: string
+    /**
+     * 可用余额
+     */
     balance: runtime.Decimal
+    /**
+     * 冻结余额（交易中 / 预授权）
+     */
     frozenBalance: runtime.Decimal
+    /**
+     * 总余额 = balance + frozenBalance
+     */
     totalBalance: runtime.Decimal
+    /**
+     * 允许的最低余额（如 0）
+     */
     minBalance: runtime.Decimal
+    /**
+     * 账户状态：ACTIVE / FROZEN / CLOSED
+     */
     status: string
+    /**
+     * 是否允许负余额（特殊账户）
+     */
     allowNegative: boolean
+    /**
+     * 乐观锁版本号（用于并发更新检测）
+     */
     version: number
+    /**
+     * 创建时间
+     */
     createdAt: Date
+    /**
+     * 更新时间
+     */
     updatedAt: Date
   }, ExtArgs["result"]["accountBalance"]>
   composites: {}

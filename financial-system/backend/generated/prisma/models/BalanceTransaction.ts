@@ -1064,35 +1064,125 @@ export type $BalanceTransactionPayload<ExtArgs extends runtime.Types.Extensions.
   name: "BalanceTransaction"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    /**
+     * 主键标识（自增 ID）
+     */
     id: number
+    /**
+     * 交易编号（业务唯一）
+     */
     transactionNo: string
+    /**
+     * 幂等键（客户端传入）
+     */
     idempotencyKey: string | null
+    /**
+     * 请求 ID（全链路追踪）
+     */
     requestId: string
+    /**
+     * 批次 ID（同一请求内多笔交易共享）
+     */
     batchId: string
+    /**
+     * 账户号
+     */
     accountId: string
+    /**
+     * 账户类型
+     */
     accountType: string
+    /**
+     * 币种
+     */
     currency: string
+    /**
+     * 交易类型：DEPOSIT/WITHDRAW/TRANSFER/PAYMENT/REFUND
+     */
     transactionType: string
+    /**
+     * 方向：DEBIT(扣款，余额减少) / CREDIT(入账，余额增加)
+     */
     direction: string
+    /**
+     * 交易金额
+     */
     amount: runtime.Decimal
+    /**
+     * 交易前余额
+     */
     beforeBalance: runtime.Decimal
+    /**
+     * 交易后余额（要求字段）
+     */
     afterBalance: runtime.Decimal
+    /**
+     * 对手方账户
+     */
     oppositeAccount: string | null
+    /**
+     * 对手方账户类型
+     */
     oppositeAccountType: string | null
+    /**
+     * 业务参考号（如订单号）
+     */
     businessRefNo: string | null
+    /**
+     * 状态：PENDING/PROCESSING/SUCCESS/FAILED
+     */
     status: string
+    /**
+     * 错误码
+     */
     errorCode: string | null
+    /**
+     * 错误信息
+     */
     errorMessage: string | null
+    /**
+     * 锁类型：PESSIMISTIC/OPTIMISTIC
+     */
     lockType: string
+    /**
+     * 重试次数
+     */
     retryCount: number
+    /**
+     * 是否发生冲突
+     */
     conflictDetected: boolean
+    /**
+     * 业务时间
+     */
     transactionTime: Date
+    /**
+     * 记录创建时间
+     */
     createdAt: Date
+    /**
+     * 记录更新时间
+     */
     updatedAt: Date
+    /**
+     * 会计日期
+     */
     accountingDate: Date
+    /**
+     * 扩展信息
+     */
     metadata: runtime.JsonValue | null
+    /**
+     * 客户端信息
+     */
     clientInfo: runtime.JsonValue | null
+    /**
+     * 对账标记
+     */
     reconciled: boolean
+    /**
+     * 对账完成时间
+     */
     reconciledAt: Date | null
   }, ExtArgs["result"]["balanceTransaction"]>
   composites: {}

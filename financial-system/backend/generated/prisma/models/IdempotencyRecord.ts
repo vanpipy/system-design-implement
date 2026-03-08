@@ -530,16 +530,49 @@ export type $IdempotencyRecordPayload<ExtArgs extends runtime.Types.Extensions.I
   name: "IdempotencyRecord"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    /**
+     * 主键标识（自增 ID）
+     */
     id: number
+    /**
+     * 幂等键
+     */
     idempotencyKey: string
+    /**
+     * 请求内容哈希（防止参数不同但 key 相同）
+     */
     requestHash: string
+    /**
+     * 幂等请求状态：PROCESSING / SUCCESS / FAILED
+     */
     status: string
+    /**
+     * 成功时返回的响应数据快照
+     */
     responseData: runtime.JsonValue | null
+    /**
+     * 错误时的详细信息
+     */
     errorInfo: runtime.JsonValue | null
+    /**
+     * 额外元数据（如调用方标识等）
+     */
     metadata: runtime.JsonValue | null
+    /**
+     * 关联生成的交易编号
+     */
     transactionNo: string | null
+    /**
+     * 过期时间（用于清理与重试保护）
+     */
     expiredAt: Date
+    /**
+     * 创建时间
+     */
     createdAt: Date
+    /**
+     * 更新时间
+     */
     updatedAt: Date
   }, ExtArgs["result"]["idempotencyRecord"]>
   composites: {}

@@ -218,6 +218,5 @@ export class PrismaClient {
     findUnique: () => Promise.resolve(null),
     create: () => Promise.resolve(null),
     update: () => Promise.resolve(null),
-    deleteMany: () => Promise.resolve({ count: 0 }),
   };
 }

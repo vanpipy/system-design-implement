@@ -556,16 +556,49 @@ export type $BalanceSnapshotPayload<ExtArgs extends runtime.Types.Extensions.Int
   name: "BalanceSnapshot"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    /**
+     * 主键标识（自增 ID）
+     */
     id: number
+    /**
+     * 账户号
+     */
     accountId: string
+    /**
+     * 账户类型
+     */
     accountType: string
+    /**
+     * 币种
+     */
     currency: string
+    /**
+     * 请求 ID（与上游请求及交易流水关联）
+     */
     requestId: string
+    /**
+     * 快照前余额
+     */
     beforeBalance: runtime.Decimal
+    /**
+     * 快照后余额
+     */
     afterBalance: runtime.Decimal
+    /**
+     * 快照状态：SUCCESS / REJECTED 等
+     */
     status: string
+    /**
+     * 会计日期
+     */
     accountingDate: Date
+    /**
+     * 快照创建时间
+     */
     createdAt: Date
+    /**
+     * 扩展信息（可记录交易编号列表等）
+     */
     metadata: runtime.JsonValue | null
   }, ExtArgs["result"]["balanceSnapshot"]>
   composites: {}

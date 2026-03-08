@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 interface SnapshotQueryParams {
   requestId?: string;
@@ -83,7 +83,7 @@ export class SnapshotService {
       },
     });
 
-    return snapshots.map((snapshot) => ({
+    return snapshots.map<SnapshotItem>((snapshot) => ({
       snapshotId: snapshot.id,
       requestId: snapshot.requestId,
       accountId: snapshot.accountId,

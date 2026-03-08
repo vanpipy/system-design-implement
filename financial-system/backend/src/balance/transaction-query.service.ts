@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 interface TransactionQueryParams {
   accountId: string;
@@ -76,7 +76,7 @@ export class TransactionQueryService {
       },
     });
 
-    return transactions.map((tx) => ({
+    return transactions.map<TransactionItem>((tx) => ({
       transactionNo: tx.transactionNo,
       requestId: tx.requestId,
       batchId: tx.batchId,
