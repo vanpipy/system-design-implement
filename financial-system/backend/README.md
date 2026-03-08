@@ -48,6 +48,53 @@ DATABASE_URL="postgresql://user:password@localhost:5432/financial_system"
 
 修改 provider 后需重新生成 Prisma Client。
 
+### Balance Module Quickstart
+
+```bash
+# 迁移与生成
+cd backend
+npx prisma migrate dev --name init_balance_models
+npx prisma generate
+
+# 启动开发
+npm install
+npm run start:dev
+```
+
+提交交易：
+
+```bash
+curl -X POST http://localhost:3000/balances/transactions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requestId": "REQ-README-1",
+    "idempotencyKey": "IDEMP-README-1",
+    "account": { "accountId": "ACC-README", "accountType": "CASH", "currency": "CNY" },
+    "transactions": [
+      { "transactionType": "DEPOSIT", "direction": "CREDIT", "amount": "10.00" }
+    ]
+  }'
+```
+
+批量查询余额（POST /balances）：
+
+```bash
+curl -X POST http://localhost:3000/balances \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accounts": [
+      { "accountId": "ACC-README", "accountType": "CASH", "currency": "CNY" }
+    ]
+  }'
+```
+
+### Error Codes（Balance）
+
+- INVALID_PARAMS：请求缺少必填参数或参数格式不合法
+- NOT_FOUND：资源不存在
+- INSUFFICIENT_FUNDS：超扣策略触发导致请求被拒绝
+- INTERNAL_ERROR：服务内部错误
+
 ### Prisma migrations
 
 每次调整数据模型后，使用 Prisma 迁移同步数据库结构:
