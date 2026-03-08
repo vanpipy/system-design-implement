@@ -91,27 +91,46 @@
 
 ## 2. 查询余额
 
-- **Endpoint**: `GET /balances`
-- **用途**: 查询单个账户当前余额信息。  
+- **Endpoint**: `POST /balances`
+- **用途**: 在一次请求中查询多个账户的当前余额信息。  
 
-### Request (query)
-
-- `accountId` (required)  
-- `accountType` (required)  
-- `currency` (required)  
-
-### Response
+#### Request (body)
 
 ```json
 {
-  "accountId": "string",
-  "accountType": "CASH",
-  "currency": "CNY",
-  "balance": "900.00",
-  "frozenBalance": "0.00",
-  "totalBalance": "900.00",
-  "status": "ACTIVE",
-  "allowNegative": false
+  "accounts": [
+    { "accountId": "string", "accountType": "CASH", "currency": "CNY" },
+    { "accountId": "string", "accountType": "MARGIN", "currency": "USD" }
+  ]
+}
+```
+
+约束：
+- accounts 为非空数组，元素去重依据 accountId + accountType + currency。
+- 当某个账户不存在时，可在响应 items 中返回该账户并标注 `status: "NOT_FOUND"`，或直接省略（实现可选其一，推荐前者便于调用方对齐序列）。
+
+#### Response
+
+```json
+{
+  "items": [
+    {
+      "accountId": "string",
+      "accountType": "CASH",
+      "currency": "CNY",
+      "balance": "900.00",
+      "frozenBalance": "0.00",
+      "totalBalance": "900.00",
+      "status": "ACTIVE",
+      "allowNegative": false
+    },
+    {
+      "accountId": "string",
+      "accountType": "MARGIN",
+      "currency": "USD",
+      "status": "NOT_FOUND"
+    }
+  ]
 }
 ```
 

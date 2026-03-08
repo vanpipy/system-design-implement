@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Post,
   Query,
   Res,
@@ -15,6 +14,7 @@ import { BalanceService } from './balance.service';
 import { CreateBalanceTransactionsDto } from './dto/create-balance-transactions.dto';
 import { SnapshotService } from './snapshot.service';
 import { TransactionQueryService } from './transaction-query.service';
+import { BatchBalanceQueryDto } from './dto/batch-balance-query.dto';
 
 @Controller('balances')
 export class BalanceController {
@@ -96,53 +96,72 @@ export class BalanceController {
     return { items };
   }
 
-  @Get()
-  async getBalance(
-    @Query('accountId') accountId?: string,
-    @Query('accountType') accountType?: string,
-    @Query('currency') currency?: string,
-  ): Promise<unknown> {
-    if (!accountId || !accountType || !currency) {
-      throw new BadRequestException(
-        'accountId、accountType、currency 为必填参数',
-      );
+  @Post()
+  @HttpCode(HttpStatus.OK)
+  async getBalancesBatch(
+    @Body() body: BatchBalanceQueryDto,
+  ): Promise<{ items: unknown[] }> {
+    if (!body || !Array.isArray((body as { accounts?: unknown[] }).accounts)) {
+      throw new BadRequestException('accounts 为必填且需为非空数组');
     }
-    const record = (await this.balanceService.getBalance({
-      accountId,
-      accountType,
-      currency,
-    })) as
-      | {
-          accountId: string;
-          accountType: string;
-          currency: string;
-          balance: { toString: () => string } | string;
-          frozenBalance?: { toString: () => string } | string;
-          minBalance?: { toString: () => string } | string;
-          totalBalance?: { toString: () => string } | string;
-          status?: string;
-          allowNegative?: boolean;
-          updatedAt?: Date;
-        }
-      | null;
-    if (!record) {
-      throw new NotFoundException('账户不存在');
+    if (body.accounts.length === 0) {
+      throw new BadRequestException('accounts 为必填且需为非空数组');
     }
+    for (const a of body.accounts) {
+      if (!a.accountId || !a.accountType || !a.currency) {
+        throw new BadRequestException(
+          'accounts[*] 的 accountId、accountType、currency 为必填参数',
+        );
+      }
+    }
+    const results = await Promise.all(
+      body.accounts.map(
+        (a) =>
+          this.balanceService.getBalance({
+            accountId: a.accountId,
+            accountType: a.accountType,
+            currency: a.currency,
+          }) as Promise<{
+            accountId: string;
+            accountType: string;
+            currency: string;
+            balance: { toString: () => string } | string;
+            frozenBalance?: { toString: () => string } | string;
+            minBalance?: { toString: () => string } | string;
+            totalBalance?: { toString: () => string } | string;
+            status?: string;
+            allowNegative?: boolean;
+            updatedAt?: Date;
+          } | null>,
+      ),
+    );
     const toStr = (v: unknown, d = '0.00') =>
       v && typeof (v as { toString: () => string }).toString === 'function'
         ? (v as { toString: () => string }).toString()
-        : (v as string | undefined) ?? d;
-    return {
-      accountId: record.accountId,
-      accountType: record.accountType,
-      currency: record.currency,
-      balance: toStr(record.balance),
-      frozenBalance: toStr(record.frozenBalance),
-      totalBalance: toStr(record.totalBalance, toStr(record.balance)),
-      minBalance: toStr(record.minBalance),
-      status: record.status ?? 'ACTIVE',
-      allowNegative: record.allowNegative ?? false,
-      updatedAt: record.updatedAt?.toISOString?.() ?? undefined,
-    };
+        : ((v as string | undefined) ?? d);
+    const items = results.map((record, idx) => {
+      const id = body.accounts[idx];
+      if (!record) {
+        return {
+          accountId: id.accountId,
+          accountType: id.accountType,
+          currency: id.currency,
+          status: 'NOT_FOUND',
+        };
+      }
+      return {
+        accountId: record.accountId,
+        accountType: record.accountType,
+        currency: record.currency,
+        balance: toStr(record.balance),
+        frozenBalance: toStr(record.frozenBalance),
+        totalBalance: toStr(record.totalBalance, toStr(record.balance)),
+        minBalance: toStr(record.minBalance),
+        status: record.status ?? 'ACTIVE',
+        allowNegative: record.allowNegative ?? false,
+        updatedAt: record.updatedAt?.toISOString?.() ?? undefined,
+      };
+    });
+    return { items };
   }
 }

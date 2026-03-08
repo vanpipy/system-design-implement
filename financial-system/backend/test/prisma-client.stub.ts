@@ -131,10 +131,14 @@ export class PrismaClient {
           lte?: Date;
         };
         if (range.gte) {
-          results = results.filter((tx) => tx.transactionTime >= Number(range.gte));
+          results = results.filter(
+            (tx) => tx.transactionTime >= Number(range.gte),
+          );
         }
         if (range.lte) {
-          results = results.filter((tx) => tx.transactionTime <= Number(range.lte));
+          results = results.filter(
+            (tx) => tx.transactionTime <= Number(range.lte),
+          );
         }
       }
 

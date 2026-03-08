@@ -4,7 +4,7 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { AppModule } from '../../src/app.module';
 
-describe('GET /balances negative cases (e2e)', () => {
+describe('POST /balances negative cases (e2e)', () => {
   let app: INestApplication;
   let http: App;
 
@@ -22,29 +22,20 @@ describe('GET /balances negative cases (e2e)', () => {
     await app.close();
   });
 
-  it('should return 400 when all query params are missing', async () => {
-    const res = await request(http).get('/balances');
+  it('should return 400 when accounts is missing', async () => {
+    const res = await request(http).post('/balances').send({});
     expect(res.status).toBe(400);
   });
 
-  it('should return 400 when only accountId is provided', async () => {
-    const res = await request(http)
-      .get('/balances')
-      .query({ accountId: 'ACC-X' });
+  it('should return 400 when accounts is empty', async () => {
+    const res = await request(http).post('/balances').send({ accounts: [] });
     expect(res.status).toBe(400);
   });
 
-  it('should return 400 when accountId and accountType are provided without currency', async () => {
+  it('should return 400 when any item missing required fields', async () => {
     const res = await request(http)
-      .get('/balances')
-      .query({ accountId: 'ACC-X', accountType: 'CASH' });
+      .post('/balances')
+      .send({ accounts: [{ accountId: 'ACC-X', accountType: 'CASH' }] });
     expect(res.status).toBe(400);
-  });
-
-  it('should return 404 when account triple is provided but account does not exist', async () => {
-    const res = await request(http)
-      .get('/balances')
-      .query({ accountId: 'NON-EXIST', accountType: 'CASH', currency: 'CNY' });
-    expect(res.status).toBe(404);
   });
 });
