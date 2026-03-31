@@ -95,3 +95,7 @@ lerna-debug.log*
 Thumbs.db
 
 docs/superpowers
+.gradle/
+.spring-init-tmp/
+out/
+*.iml

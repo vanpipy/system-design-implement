@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: short-link-system
+  profiles:
+    default: dev
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+shortlink:
+  code:
+    length: 8
+    alphabet: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+  cache:
+    ttl-seconds: 3600
