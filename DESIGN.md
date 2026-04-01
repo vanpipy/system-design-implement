@@ -231,7 +231,6 @@ graph TB
 | **Development DB** | H2 Database | In-memory database for development |
 | **ORM** | MyBatis-Plus | Database access and mapping |
 | **Redis Client** | Lettuce + Redisson | Redis connectivity and distributed locks |
-| **Local Cache** | Caffeine | In-memory caching |
 | **Database Sharding** | ShardingSphere-JDBC | Database sharding and read-write separation |
 | **Rate Limiting** | Resilience4j | Circuit breaking and rate limiting |
 | **Distributed Rate Limiting** | Bucket4j + Redis | Distributed rate limiting coordination |
@@ -254,7 +253,7 @@ graph TB
 - Data redundancy and backup strategies
 
 ### Performance
-- Multi-level caching (Redis + Caffeine)
+- Caching layers to reduce database load
 - Database query optimization
 - Asynchronous processing where applicable
 

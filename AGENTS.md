@@ -263,6 +263,17 @@ shortlink:
 3. **Automatic Schema Creation**: Tables are created automatically on application startup
 4. **Data Persistence**: Data persists while application is running, resets on restart
 
+**Redis for Local Development (Docker Compose):**
+
+1. **Auto-start via Spring Boot**: In dev profile, Spring Boot can start `compose.yaml` automatically when running the app
+2. **Manual start (optional)**: `docker compose up -d`
+
+**Redis Sentinel (Production-like):**
+
+1. Start local Sentinel topology: `docker compose -f compose-sentinel.yaml up -d`
+2. Run with Sentinel profile group: `SPRING_PROFILES_ACTIVE=prod-sentinel`
+3. Configure Sentinel nodes: `REDIS_SENTINEL_NODES=host1:26379,host2:26379,host3:26379`
+
 ## Development Workflow
 
 ### 1. Before Starting

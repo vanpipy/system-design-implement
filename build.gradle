@@ -21,7 +21,6 @@ ext {
 	mybatisPlusVersion = '3.5.16'
 	shardingsphereVersion = '5.5.2'
 	redissonVersion = '4.2.0'
-	caffeineVersion = '3.1.8'
 	resilience4jVersion = '2.2.0'
 	mapstructVersion = '1.6.0'
 	hutoolVersion = '5.8.27'
@@ -37,7 +36,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation "cn.hutool:hutool-all:${hutoolVersion}"
 	implementation "com.baomidou:mybatis-plus-spring-boot4-starter:${mybatisPlusVersion}"
-	implementation "com.github.ben-manes.caffeine:caffeine:${caffeineVersion}"
 	implementation "io.github.resilience4j:resilience4j-circuitbreaker:${resilience4jVersion}"
 	implementation "io.github.resilience4j:resilience4j-micrometer:${resilience4jVersion}"
 	implementation "io.github.resilience4j:resilience4j-ratelimiter:${resilience4jVersion}"

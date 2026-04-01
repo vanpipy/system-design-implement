@@ -3,6 +3,10 @@ spring:
     name: short-link-system
   profiles:
     default: dev
+    group:
+      prod-sentinel:
+        - prod
+        - prod-sentinel
 
 server:
   port: 8080

@@ -50,6 +50,7 @@ The system follows a layered architecture:
 - Java 21 or later
 - **Development**: No database installation required (uses H2 in-memory database)
 - **Production**: PostgreSQL 15+ and Redis 7+
+- Docker + Docker Compose (for local Redis via compose.yaml)
 - Gradle 8+
 
 ### Installation
@@ -82,7 +83,21 @@ The system follows a layered architecture:
 4. Access: http://localhost:8080
 5. Database Console: http://localhost:8080/h2-console
 
-**Note**: No external database setup required for development.
+**Note**: In dev profile, the application starts a local Redis via `compose.yaml` (requires Docker).
+
+### Redis Sentinel (Local or Production-like)
+
+Start a local Redis Sentinel topology:
+```bash
+docker compose -f compose-sentinel.yaml up -d
+```
+
+Run the application using Sentinel configuration:
+```bash
+REDIS_SENTINEL_NODES=localhost:26379,localhost:26380,localhost:26381 \
+SPRING_PROFILES_ACTIVE=prod-sentinel \
+./gradlew bootRun
+```
 
 ### API Usage
 
