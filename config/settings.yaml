@@ -1,0 +1,125 @@
+# General RAG System Configuration
+# This file contains the main configuration for the General RAG system
+
+general_rag:
+  environment: development  # development, staging, production
+  debug: true
+  log_level: INFO
+  
+  api:
+    host: 0.0.0.0
+    port: 8000
+    workers: 4
+    timeout: 30
+    docs_enabled: true
+    redoc_enabled: true
+    cors_origins:
+      - "http://localhost:3000"
+      - "http://localhost:8000"
+    log_level: info
+    reload: true
+  
+  database:
+    postgresql:
+      host: localhost
+      port: 5432
+      database: general_rag
+      username: postgres
+      password: ${POSTGRES_PASSWORD:?PostgreSQL password is required}
+      pool_size: 20
+      echo: false
+    
+    qdrant:
+      host: localhost
+      port: 6333
+      collection: documents
+      vector_size: 384
+      distance: Cosine
+    
+    redis:
+      host: localhost
+      port: 6379
+      db: 0
+      password: ${REDIS_PASSWORD:?Redis password is required}
+      decode_responses: true
+  
+  models:
+    embedding:
+      name: BAAI/bge-small-zh-v1.5
+      device: cpu
+      max_length: 512
+      normalize_embeddings: true
+    
+    llm:
+      primary:
+        provider: deepseek
+        api_key: ${DEEPSEEK_API_KEY:?DeepSeek API key is required}
+        model: deepseek-chat
+        temperature: 0.7
+        max_tokens: 2000
+      
+      fallback:
+        provider: local
+        model_path: ./models/qwen2.5-1.5b.gguf
+        context_size: 4096
+        temperature: 0.7
+  
+  frameworks:
+    langchain:
+      prompt_templates:
+        rag_template: |
+          You are a helpful assistant. Use the following context to answer the question.
+          
+          Context: {context}
+          
+          Question: {question}
+          
+          Answer:
+        chat_template: |
+          You are a friendly chatbot. Respond to the user conversationally.
+          
+          Conversation history: {history}
+          
+          User: {input}
+          
+          Assistant:
+      output_parsers_enabled: true
+      streaming_enabled: false
+      callbacks_enabled: true
+    
+    llamaindex:
+      document_reader:
+        supported_formats: [".pdf", ".docx", ".txt", ".md", ".html"]
+        chunk_size: 1000
+        chunk_overlap: 200
+      node_parser:
+        type: semantic
+        buffer_size: 1
+        breakpoint_percentile_threshold: 95
+      embedding:
+        provider: huggingface
+        model_name: BAAI/bge-small-zh-v1.5
+        device: cpu
+  
+  services:
+    intent_recognition:
+      rule_matching_enabled: true
+      cache_matching_enabled: true
+      ml_classification_enabled: true
+      confidence_threshold: 0.6
+    
+    rag:
+      top_k: 5
+      rerank_enabled: true
+      max_context_length: 4000
+      similarity_threshold: 0.7
+    
+    caching:
+      enabled: true
+      ttl_seconds: 3600
+      max_size_mb: 1000
+    
+    rate_limiting:
+      enabled: true
+      requests_per_minute: 60
+      requests_per_hour: 1000
